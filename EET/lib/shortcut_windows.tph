@@ -23,8 +23,8 @@ set SCRIPT="%TEMP%\%RANDOM%-%RANDOM%-%RANDOM%-%RANDOM%.vbs"
 echo Set oWS = WScript.CreateObject("WScript.Shell") >> %SCRIPT%
 echo sLinkFile = "EET\temp\EET.lnk" >> %SCRIPT%
 echo Set oLink = oWS.CreateShortcut(sLinkFile) >> %SCRIPT%
-echo oLink.TargetPath = "%CD%\Baldur.exe" >> %SCRIPT%
-: echo oLink.IconLocation = "%CD%\Baldur.exe, 0" >> %SCRIPT%
+echo oLink.TargetPath = "%CD%\__BINARY__" >> %SCRIPT%
+: echo oLink.IconLocation = "%CD%\__BINARY__, 0" >> %SCRIPT%
 echo oLink.IconLocation = "%CD%\EET\docs\images\eet.ico" >> %SCRIPT%
 echo oLink.WorkingDirectory = "%CD%" >> %SCRIPT%
 echo oLink.Description = "Enhanced Edition Trilogy (EET)" >> %SCRIPT%
@@ -34,7 +34,15 @@ cscript /nologo %SCRIPT%
 del %SCRIPT%
 >>>>>>>>
 
+ACTION_IF (FILE_EXISTS ~BaldurII.exe~) BEGIN
+  // patch 2.7 might have changed the name of the executable
+  OUTER_SPRINT BINARY ~BaldurII.exe~
+END ELSE BEGIN
+  OUTER_SPRINT BINARY ~Baldur.exe~
+END
+
 COPY + ~.../shortcut.bat~ ~shortcut.bat~
+  REPLACE_TEXTUALLY CASE_SENSITIVE EXACT_MATCH ~__BINARY__~ ~%BINARY%~
 AT_NOW ~shortcut.bat~
 DELETE + ~shortcut.bat~
 COPY ~%MOD_FOLDER%/temp/EET.lnk~ ~%dir%~
